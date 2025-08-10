@@ -1,0 +1,3265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Urban Gardening Assistant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    :root {
+      --primary: #2e7d32;
+      --primary-light: #4caf50;
+      --primary-dark: #1b5e20;
+      --secondary: #ff9800;
+      --accent: #8bc34a;
+      --light: #f8fbf8;
+      --dark: #333;
+      --gray: #666;
+      --danger: #f44336;
+      --success: #4caf50;
+      --info: #2196f3;
+      --bg-primary: #f0f7f4; /* Updated to a softer green-tinted background for modern feel */
+      --bg-secondary: #e8f5e9;
+      --text-primary: #2c3e50;
+      --text-secondary: #7f8c8d;
+      --card-bg: #ffffff;
+      --header-bg: linear-gradient(to right, var(--primary), var(--primary-light));
+      --shadow: 0 4px 12px rgba(0, 128, 0, 0.1); /* Greener shadow */
+    }
+
+    .dark-theme {
+      --primary: #4CAF50;
+      --primary-light: #388E3C;
+      --primary-dark: #1B5E20;
+      --secondary: #FFA726;
+      --accent: #7CB342;
+      --light: #121212;
+      --dark: #e0e0e0;
+      --gray: #9e9e9e;
+      --danger: #e57373;
+      --success: #66BB6A;
+      --info: #64B5F6;
+      --bg-primary: #1a2a1a; /* Darker green-tinted background */
+      --bg-secondary: #252f25;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
+      --card-bg: #2a3a2a;
+      --header-bg: linear-gradient(to right, var(--primary-dark), var(--primary));
+      --shadow: 0 4px 12px rgba(0, 50, 0, 0.3);
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Mobile Navigation Styles */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 10px;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--card-bg);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    .mobile-nav.active {
+      display: flex;
+    }
+
+    .mobile-nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 12px 5px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+    }
+
+    .mobile-nav-item.active, .mobile-nav-item:hover {
+      color: var(--primary);
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .mobile-nav-item i {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    /* Header Styles */
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 2rem;
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    nav a:hover, nav a.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05); /* Added subtle hover scale for modern feel */
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .notification-btn {
+      position: relative;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .notification-btn:hover {
+      transform: rotate(15deg);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1);
+    }
+
+    .theme-toggle {
+      background: rgba(255,255,255,0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(180deg);
+    }
+
+    /* Page Styles */
+    main {
+      position: relative;
+      min-height: calc(100vh - 200px);
+    }
+
+    .page {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 2rem 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .page.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+      text-align: center;
+      animation: fadeInDown 0.5s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-header h2 {
+      font-size: 2.2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .page-header h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--secondary);
+      border-radius: 2px;
+    }
+
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 1rem auto 0;
+      line-height: 1.6;
+    }
+
+    /* Form Styles */
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px; /* Softer corners for modern look */
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 128, 0, 0.15); /* Enhanced shadow on hover */
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, 
+    .form-group select:focus, 
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+    }
+
+    button {
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      transform: translateY(-2px) scale(1.02); /* Added scale for modern button effect */
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(to right, var(--secondary), #ffb74d);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(to right, #e65100, var(--secondary));
+    }
+
+    .btn-info {
+      background: linear-gradient(to right, var(--info), #64b5f6);
+    }
+
+    .btn-info:hover {
+      background: linear-gradient(to right, #0d47a1, var(--info));
+    }
+
+    /* Dashboard Styles */
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--primary);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover .stat-icon {
+      transform: rotate(360deg);
+    }
+
+    .stat-info h3 {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-info p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .weather-card {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #64b5f6, #2196f3);
+      color: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .weather-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+      animation: weatherGlow 5s infinite;
+    }
+
+    @keyframes weatherGlow {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(10%, 10%); }
+      100% { transform: translate(0, 0); }
+    }
+
+    .weather-current {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .weather-icon {
+      font-size: 3rem;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .weather-temp {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    .weather-location {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .weather-forecast {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .forecast-item {
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    .forecast-item:hover {
+      transform: scale(1.1);
+    }
+
+    .forecast-item i {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .calendar-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendar-day {
+      height: 100px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      padding: 8px;
+      position: relative;
+      overflow-y: auto;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--card-bg);
+    }
+
+    .calendar-day:hover {
+      background: var(--bg-secondary);
+      transform: scale(1.05);
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      padding: 0.5rem 0;
+      background: var(--bg-secondary);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .day-number {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-secondary);
+    }
+
+    .event {
+      background: var(--accent);
+      color: white;
+      font-size: 0.8rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .plant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .plant-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .plant-card:hover {
+      transform: translateY(-5px) rotate(2deg); /* Added slight rotate for dynamic feel */
+      box-shadow: 0 8px 24px rgba(0, 128, 0, 0.15);
+    }
+
+    .plant-img {
+      height: 180px;
+      background: linear-gradient(45deg, #81c784, #a5d6a7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: white;
+      position: relative;
+    }
+
+    .plant-img::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .plant-card:hover .plant-img::after {
+      opacity: 1;
+    }
+
+    .plant-info {
+      padding: 1.5rem;
+    }
+
+    .plant-info h3 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .plant-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .progress-container {
+      margin: 1rem 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 1s ease; /* Smooth progress animation */
+    }
+
+    /* Disease Detection */
+    .upload-area {
+      border: 3px dashed var(--gray);
+      border-radius: 16px;
+      padding: 3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--bg-secondary);
+    }
+
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(76, 175, 80, 0.05);
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .upload-area:hover .upload-icon {
+      transform: scale(1.2);
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .healthy .result-icon {
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--success);
+    }
+
+    .disease .result-icon {
+      background: rgba(244, 67, 54, 0.2);
+      color: var(--danger);
+    }
+
+    .solution-list {
+      margin-top: 1.5rem;
+    }
+
+    .solution-list li {
+      margin-bottom: 0.8rem;
+      padding-left: 1.5rem;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .solution-list li:hover {
+      transform: translateX(5px);
+    }
+
+    .solution-list li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    /* Reminders */
+    .reminder-list {
+      margin-top: 1.5rem;
+    }
+
+    .reminder-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray);
+      transition: background 0.3s ease;
+    }
+
+    .reminder-item:hover {
+      background: var(--bg-secondary);
+    }
+
+    .reminder-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-right: 1rem;
+    }
+
+    .reminder-info {
+      flex: 1;
+    }
+
+    .reminder-info h4 {
+      margin-bottom: 0.3rem;
+    }
+
+    .reminder-meta {
+      display: flex;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .reminder-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Plant Identification */
+    .plant-id-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .plant-id-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .plant-id-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .plant-id-img {
+      height: 150px;
+      background: linear-gradient(45deg, #aed581, #c5e1a5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+
+    .plant-id-info {
+      padding: 1rem;
+    }
+
+    .plant-id-info h4 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .confidence {
+      display: inline-block;
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--primary);
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Plant Encyclopedia */
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .plant-encyclopedia {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .encyclopedia-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .encyclopedia-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .encyclopedia-img {
+      height: 160px;
+      background: linear-gradient(45deg, #81c784, #a5d6a7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      color: white;
+    }
+
+    .encyclopedia-info {
+      padding: 1.5rem;
+    }
+
+    .encyclopedia-info h3 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .plant-type {
+      display: inline-block;
+      background: rgba(255, 152, 0, 0.15);
+      color: var(--secondary);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .plant-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-item i {
+      color: var(--primary);
+    }
+
+    /* Garden Planner */
+    .garden-planner {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+    }
+
+    .planner-tools {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .planner-toolbox {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .planner-tool {
+      text-align: center;
+      padding: 1rem;
+      border: 2px dashed var(--gray);
+      border-radius: 8px;
+      cursor: move;
+      transition: all 0.2s ease;
+    }
+
+    .planner-tool:hover {
+      border-color: var(--primary);
+      background: rgba(76, 175, 80, 0.05);
+      transform: scale(1.05);
+    }
+
+    .planner-tool i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .planner-area {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      min-height: 500px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+
+    .garden-item {
+      position: absolute;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: move;
+      transition: transform 0.2s ease;
+    }
+
+    .garden-item:hover {
+      transform: scale(1.1);
+    }
+
+    .garden-item i {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    /* Garden Journal */
+    .journal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .journal-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .journal-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .journal-img {
+      height: 200px;
+      background: linear-gradient(45deg, #81c784, #a5d6a7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      color: white;
+    }
+
+    .journal-content {
+      padding: 1.5rem;
+    }
+
+    .journal-date {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .journal-content h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .journal-content p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .journal-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .journal-tag {
+      background: rgba(139, 195, 74, 0.15);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      transition: background 0.3s ease;
+    }
+
+    .journal-tag:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Community Forum */
+    .forum-posts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .forum-post {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .forum-post:hover {
+      transform: translateY(-5px);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #e0f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--info);
+    }
+
+    .post-meta {
+      flex: 1;
+    }
+
+    .post-author {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .post-date {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .post-content h3 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .post-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .post-tag {
+      background: rgba(139, 195, 74, 0.15);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .action-count {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .action-count:hover {
+      color: var(--primary);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+
+    .footer-section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .footer-section h3::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: var(--secondary);
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      color: #bdbdbd;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #37474f;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid #37474f;
+      color: #bdbdbd;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: modalPop 0.3s ease;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.5rem;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .close-modal:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    /* Login Page */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 500px;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .login-options {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .social-login {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .social-login:hover {
+      transform: translateY(-3px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0;
+      color: var(--text-secondary);
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    .divider span {
+      padding: 0 1rem;
+    }
+
+    .forgot-password {
+      display: block;
+      margin-top: 1rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .create-account {
+      margin-top: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .create-account a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Advanced Features */
+    .ai-suggestions {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .suggestion-item {
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      background: var(--bg-secondary);
+    }
+
+    .suggestion-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .sensor-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .sensor-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .sensor-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 0.5rem 0;
+    }
+
+    .sensor-status {
+      font-size: 0.9rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .status-good {
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--success);
+    }
+
+    .status-warning {
+      background: rgba(255, 152, 0, 0.15);
+      color: var(--secondary);
+    }
+
+    .status-danger {
+      background: rgba(244, 67, 54, 0.15);
+      color: var(--danger);
+    }
+
+    .automation-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .automation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .automation-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .automation-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--gray);
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .history-chart {
+      height: 200px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      margin-top: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      position: absolute;
+      bottom: 0;
+      width: 20px;
+      background: var(--primary);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s ease;
+    }
+
+    .ai-analysis {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .ai-icon {
+      font-size: 2rem;
+      color: var(--info);
+    }
+
+    /* Extra Feature: AI Chat Button */
+    .ai-chat-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .ai-chat-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Extra Feature: Progress Tracker in Dashboard */
+    .progress-tracker {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .tracker-item {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tracker-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .tracker-progress {
+      flex: 1;
+    }
+
+    .tracker-bar {
+      height: 6px;
+      background: var(--bg-secondary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .tracker-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 1s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .garden-planner {
+        grid-template-columns: 1fr;
+      }
+
+      .weather-card {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      nav ul {
+        display: none;
+      }
+
+      .header-content {
+        flex-direction: row;
+        gap: 1rem;
+      }
+
+      .logo h1 {
+        font-size: 1.5rem;
+      }
+
+      .calendar-grid {
+        grid-template-columns: repeat(1, 1fr);
+      }
+
+      .calendar-day {
+        height: auto;
+        min-height: 120px;
+      }
+
+      .login-card {
+        padding: 2rem;
+      }
+
+      .header-actions .notification-btn, 
+      .header-actions .theme-toggle {
+        display: none;
+      }
+
+      .mobile-nav {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo h1 {
+        font-size: 1.2rem;
+      }
+
+      .user-avatar {
+        width: 35px;
+        height: 35px;
+      }
+
+      .page-header h2 {
+        font-size: 1.8rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      .plant-grid, 
+      .plant-encyclopedia, 
+      .plant-id-results, 
+      .journal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .weather-card {
+        grid-template-columns: 1fr;
+      }
+
+      .weather-forecast {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body class="light-theme">
+  <!-- Login Page (Shown first) -->
+  <div id="login-page" class="login-container">
+    <div class="login-card">
+      <div class="logo" style="justify-content: center; margin-bottom: 1.5rem;">
+        <i class="fas fa-seedling"></i>
+        <h1>Smart Urban Gardening</h1>
+      </div>
+
+      <h2>Welcome to Your Garden Assistant</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Sign in to manage your urban garden</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <input type="email" id="loginEmail" placeholder="Email Address" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Password" required>
+        </div>
+        <button type="submit" style="width: 100%;">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <a href="#" class="forgot-password">Forgot your password?</a>
+
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+
+      <div class="login-options">
+        <div class="social-login" style="color: #DB4437;">
+          <i class="fab fa-google"></i>
+        </div>
+        <div class="social-login" style="color: #1877F2;">
+          <i class="fab fa-facebook-f"></i>
+        </div>
+        <div class="social-login" style="color: #1DA1F2;">
+          <i class="fab fa-twitter"></i>
+        </div>
+      </div>
+
+      <div class="create-account">
+        Don't have an account? <a href="#" id="show-app">Continue without account</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App (Hidden initially) -->
+  <div id="app-container" style="display: none;">
+    <!-- Header -->
+    <header>
+      <div class="container header-content">
+        <button class="mobile-menu-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+          <i class="fas fa-seedling"></i>
+          <h1>Smart Urban Gardening</h1>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+            <li><a href="#" class="nav-link" data-page="garden-setup">My Garden</a></li>
+            <li><a href="#" class="nav-link" data-page="plant-encyclopedia">Plant Library</a></li>
+            <li><a href="#" class="nav-link" data-page="disease-detection">Plant Health</a></li>
+            <li><a href="#" class="nav-link" data-page="plant-id">Plant ID</a></li>
+            <li><a href="#" class="nav-link" data-page="reminders">Reminders</a></li>
+            <li><a href="#" class="nav-link" data-page="garden-planner">Garden Planner</a></li>
+            <li><a href="#" class="nav-link" data-page="garden-journal">Garden Journal</a></li>
+            <li><a href="#" class="nav-link" data-page="community">Community</a></li>
+          </ul>
+        </nav>
+        <div class="header-actions">
+          <div class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </div>
+          <div class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </div>
+          <div class="user-avatar" id="user-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav">
+      <a href="#" class="mobile-nav-item active" data-page="dashboard">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="garden-setup">
+        <i class="fas fa-seedling"></i>
+        <span>My Garden</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="plant-encyclopedia">
+        <i class="fas fa-book"></i>
+        <span>Library</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="disease-detection">
+        <i class="fas fa-heartbeat"></i>
+        <span>Health</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="plant-id">
+        <i class="fas fa-camera"></i>
+        <span>Plant ID</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="reminders">
+        <i class="fas fa-bell"></i>
+        <span>Reminders</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="garden-planner">
+        <i class="fas fa-ruler-combined"></i>
+        <span>Planner</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="garden-journal">
+        <i class="fas fa-book-open"></i>
+        <span>Journal</span>
+      </a>
+      <a href="#" class="mobile-nav-item" data-page="community">
+        <i class="fas fa-users"></i>
+        <span>Community</span>
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+      <!-- Dashboard Page -->
+      <section id="dashboard" class="page active">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <p>Get an overview of your urban garden's status</p>
+        </div>
+
+        <div class="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-seedling"></i></div>
+            <div class="stat-info">
+              <h3>12</h3>
+              <p>Total Plants</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+            <div class="stat-info">
+              <h3>85%</h3>
+              <p>Average Health</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-tint"></i></div>
+            <div class="stat-info">
+              <h3>3</h3>
+              <p>Plants Need Water</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-sun"></i></div>
+            <div class="stat-info">
+              <h3>6 hrs</h3>
+              <p>Average Sunlight</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="weather-card">
+          <div class="weather-current">
+            <i class="fas fa-sun weather-icon"></i>
+            <div>
+              <div class="weather-temp">28°C</div>
+              <div class="weather-location"><i class="fas fa-map-marker-alt"></i> Your City</div>
+              <p>Sunny with clear skies</p>
+            </div>
+          </div>
+
+          <div class="weather-forecast">
+            <div class="forecast-item">
+              <p>Tomorrow</p>
+              <i class="fas fa-cloud-sun"></i>
+              <p>27°C</p>
+            </div>
+            <div class="forecast-item">
+              <p>Sat</p>
+              <i class="fas fa-cloud-rain"></i>
+              <p>24°C</p>
+            </div>
+            <div class="forecast-item">
+              <p>Sun</p>
+              <i class="fas fa-sun"></i>
+              <p>29°C</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extra Feature: Progress Tracker -->
+        <div class="page-header">
+          <h2>Garden Progress Tracker</h2>
+          <p>Monitor your gardening milestones</p>
+        </div>
+
+        <div class="progress-tracker">
+          <div class="tracker-item">
+            <div class="tracker-icon"><i class="fas fa-seedling"></i></div>
+            <div class="tracker-progress">
+              <div class="progress-label">
+                <span>Plant Growth</span>
+                <span>75%</span>
+              </div>
+              <div class="tracker-bar">
+                <div class="tracker-fill" style="width: 75%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracker-item">
+            <div class="tracker-icon"><i class="fas fa-apple-alt"></i></div>
+            <div class="tracker-progress">
+              <div class="progress-label">
+                <span>Harvest Readiness</span>
+                <span>60%</span>
+              </div>
+              <div class="tracker-bar">
+                <div class="tracker-fill" style="width: 60%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tracker-item">
+            <div class="tracker-icon"><i class="fas fa-leaf"></i></div>
+            <div class="tracker-progress">
+              <div class="progress-label">
+                <span>Pest Control</span>
+                <span>90%</span>
+              </div>
+              <div class="tracker-bar">
+                <div class="tracker-fill" style="width: 90%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Feature: Sensor Data -->
+        <div class="page-header">
+          <h2>Garden Sensors</h2>
+          <p>Real-time monitoring of your garden environment</p>
+        </div>
+
+        <div class="sensor-grid">
+          <div class="sensor-card">
+            <i class="fas fa-thermometer-half" style="font-size: 2rem; color: var(--danger);"></i>
+            <h3>Temperature</h3>
+            <div class="sensor-value">24.5°C</div>
+            <div class="sensor-status status-good">Optimal</div>
+          </div>
+
+          <div class="sensor-card">
+            <i class="fas fa-tint" style="font-size: 2rem; color: var(--info);"></i>
+            <h3>Soil Moisture</h3>
+            <div class="sensor-value">42%</div>
+            <div class="sensor-status status-warning">Low</div>
+          </div>
+
+          <div class="sensor-card">
+            <i class="fas fa-sun" style="font-size: 2rem; color: var(--secondary);"></i>
+            <h3>Light Intensity</h3>
+            <div class="sensor-value">78%</div>
+            <div class="sensor-status status-good">Optimal</div>
+          </div>
+
+          <div class="sensor-card">
+            <i class="fas fa-wind" style="font-size: 2rem; color: var(--primary);"></i>
+            <h3>Humidity</h3>
+            <div class="sensor-value">65%</div>
+            <div class="sensor-status status-good">Optimal</div>
+          </div>
+        </div>
+
+        <!-- Advanced Feature: AI Suggestions -->
+        <div class="page-header">
+          <h2>AI Recommendations</h2>
+          <p>Smart suggestions based on your garden data</p>
+        </div>
+
+        <div class="ai-suggestions">
+          <div class="suggestion-item">
+            <div class="suggestion-icon">
+              <i class="fas fa-tint"></i>
+            </div>
+            <div>
+              <h4>Water Tomatoes</h4>
+              <p>Soil moisture is low for tomato plants. Water immediately for optimal growth.</p>
+            </div>
+          </div>
+
+          <div class="suggestion-item">
+            <div class="suggestion-icon">
+              <i class="fas fa-cloud-sun"></i>
+            </div>
+            <div>
+              <h4>Move Basil to Shade</h4>
+              <p>High light intensity detected. Move basil plants to partial shade.</p>
+            </div>
+          </div>
+
+          <div class="suggestion-item">
+            <div class="suggestion-icon">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <div>
+              <h4>Fertilize Peppers</h4>
+              <p>It's time to fertilize your pepper plants for better yield.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advanced Feature: Plant Health History -->
+        <div class="page-header">
+          <h2>Plant Health History</h2>
+          <p>Track changes in your plant health over time</p>
+        </div>
+
+        <div class="automation-card">
+          <div class="automation-header">
+            <h3>Health Trend Analysis</h3>
+          </div>
+          <div class="history-chart" id="health-chart">
+            <!-- Chart bars will be generated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Garden Setup Page -->
+      <section id="garden-setup" class="page">
+        <div class="page-header">
+          <h2>My Garden</h2>
+          <p>Manage and monitor your plants</p>
+        </div>
+
+        <div class="card">
+          <h3>Add New Plant</h3>
+          <form id="addPlantForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="plantName">Plant Name</label>
+                <input type="text" id="plantName" placeholder="e.g., Tomato" required>
+              </div>
+              <div class="form-group">
+                <label for="plantType">Type</label>
+                <select id="plantType" required>
+                  <option value="">Select Type</option>
+                  <option value="Vegetable">Vegetable</option>
+                  <option value="Herb">Herb</option>
+                  <option value="Flower">Flower</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="plantDate">Planting Date</label>
+              <input type="date" id="plantDate" required>
+            </div>
+            <button type="submit"><i class="fas fa-plus"></i> Add Plant</button>
+          </form>
+        </div>
+
+        <div class="plant-grid">
+          <div class="plant-card">
+            <div class="plant-img"><i class="fas fa-apple-alt"></i></div>
+            <div class="plant-info">
+              <h3>Tomato</h3>
+              <p>Healthy and growing well</p>
+              <div class="progress-container">
+                <div class="progress-label">
+                  <span>Health</span>
+                  <span>90%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 90%;"></div>
+                </div>
+              </div>
+              <div class="plant-meta">
+                <span>Planted: Jul 1</span>
+                <span>Water: Daily</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="plant-card">
+            <div class="plant-img"><i class="fas fa-leaf"></i></div>
+            <div class="plant-info">
+              <h3>Basil</h3>
+              <p>Needs more sunlight</p>
+              <div class="progress-container">
+                <div class="progress-label">
+                  <span>Health</span>
+                  <span>75%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 75%;"></div>
+                </div>
+              </div>
+              <div class="plant-meta">
+                <span>Planted: Jun 15</span>
+                <span>Water: Every 2 days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="plant-card">
+            <div class="plant-img"><i class="fas fa-pepper-hot"></i></div>
+            <div class="plant-info">
+              <h3>Pepper</h3>
+              <p>Ready for harvest</p>
+              <div class="progress-container">
+                <div class="progress-label">
+                  <span>Health</span>
+                  <span>95%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 95%;"></div>
+                </div>
+              </div>
+              <div class="plant-meta">
+                <span>Planted: May 20</span>
+                <span>Water: Every 3 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Plant Identification Page -->
+      <section id="plant-id" class="page">
+        <div class="page-header">
+          <h2>Plant Identification</h2>
+          <p>Upload a photo to identify plants</p>
+        </div>
+
+        <div class="upload-area" id="plantIdUpload">
+          <i class="fas fa-upload upload-icon"></i>
+          <h3>Click to upload plant photo</h3>
+          <p>Or drag and drop here</p>
+          <input type="file" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="plant-id-results" style="display: none;">
+          <div class="plant-id-card">
+            <div class="plant-id-img"><i class="fas fa-leaf"></i></div>
+            <div class="plant-id-info">
+              <h4>Basil</h4>
+              <p>Common herb used in cooking</p>
+              <span class="confidence">95% Match</span>
+            </div>
+          </div>
+
+          <div class="plant-id-card">
+            <div class="plant-id-img"><i class="fas fa-leaf"></i></div>
+            <div class="plant-id-info">
+              <h4>Mint</h4>
+              <p>Aromatic herb for teas and dishes</p>
+              <span class="confidence">87% Match</span>
+            </div>
+          </div>
+
+          <div class="plant-id-card">
+            <div class="plant-id-img"><i class="fas fa-leaf"></i></div>
+            <div class="plant-id-info">
+              <h4>Parsley</h4>
+              <p>Culinary herb for garnishes</p>
+              <span class="confidence">78% Match</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Plant Encyclopedia Page -->
+      <section id="plant-encyclopedia" class="page">
+        <div class="page-header">
+          <h2>Plant Encyclopedia</h2>
+          <p>Explore our library of plants suitable for urban gardening</p>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="plantType">Filter by Type</label>
+            <select id="plantType">
+              <option>All Plants</option>
+              <option>Vegetables</option>
+              <option>Herbs</option>
+              <option>Flowers</option>
+              <option>Fruits</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty">
+              <option>All</option>
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="search">Search</label>
+            <input type="text" id="search" placeholder="Search plants...">
+          </div>
+        </div>
+
+        <div class="plant-encyclopedia">
+          <div class="encyclopedia-card">
+            <div class="encyclopedia-img"><i class="fas fa-carrot"></i></div>
+            <div class="encyclopedia-info">
+              <span class="plant-type">Vegetable</span>
+              <h3>Carrot</h3>
+              <p>Root vegetable that grows well in containers</p>
+              <div class="plant-stats">
+                <div class="stat-item"><i class="fas fa-sun"></i> Full Sun</div>
+                <div class="stat-item"><i class="fas fa-tint"></i> Moderate</div>
+                <div class="stat-item"><i class="fas fa-ruler"></i> 30cm</div>
+                <div class="stat-item"><i class="fas fa-clock"></i> 70 days</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="encyclopedia-card">
+            <div class="encyclopedia-img"><i class="fas fa-leaf"></i></div>
+            <div class="encyclopedia-info">
+              <span class="plant-type">Herb</span>
+              <h3>Basil</h3>
+              <p>Aromatic herb perfect for sunny windowsills</p>
+              <div class="plant-stats">
+                <div class="stat-item"><i class="fas fa-sun"></i> Partial Sun</div>
+                <div class="stat-item"><i class="fas fa-tint"></i> Regular</div>
+                <div class="stat-item"><i class="fas fa-ruler"></i> 45cm</div>
+                <div class="stat-item"><i class="fas fa-clock"></i> 60 days</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="encyclopedia-card">
+            <div class="encyclopedia-img"><i class="fas fa-apple-alt"></i></div>
+            <div class="encyclopedia-info">
+              <span class="plant-type">Fruit</span>
+              <h3>Strawberry</h3>
+              <p>Compact fruit plant for vertical gardens</p>
+              <div class="plant-stats">
+                <div class="stat-item"><i class="fas fa-sun"></i> Full Sun</div>
+                <div class="stat-item"><i class="fas fa-tint"></i> Regular</div>
+                <div class="stat-item"><i class="fas fa-ruler"></i> 20cm</div>
+                <div class="stat-item"><i class="fas fa-clock"></i> 90 days</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Disease Detection Page -->
+      <section id="disease-detection" class="page">
+        <div class="page-header">
+          <h2>Plant Health Scanner</h2>
+          <p>Detect diseases by uploading leaf photos</p>
+        </div>
+
+        <div class="upload-area" id="diseaseUpload">
+          <i class="fas fa-camera upload-icon"></i>
+          <h3>Upload Leaf Image</h3>
+          <p>Take a clear photo of the affected leaf</p>
+          <input type="file" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="result-card" id="diseaseResult" style="display: none;">
+          <div class="result-header disease">
+            <div class="result-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+              <h3>Leaf Spot Detected</h3>
+              <p>Confidence: 92%</p>
+            </div>
+          </div>
+          <p>Fungal infection common in humid conditions. Affects photosynthesis.</p>
+
+          <div class="ai-analysis">
+            <div class="ai-icon"><i class="fas fa-robot"></i></div>
+            <div>
+              <h4>AI Analysis</h4>
+              <p>Based on your plant's history and current conditions, we recommend immediate treatment.</p>
+            </div>
+          </div>
+
+          <h4>Recommended Solutions</h4>
+          <ul class="solution-list">
+            <li>Remove affected leaves</li>
+            <li>Apply fungicide spray every 3 days</li>
+            <li>Improve air circulation around plants</li>
+            <li>Reduce watering frequency</li>
+            <li>Apply neem oil as preventive measure</li>
+          </ul>
+
+          <div class="form-group" style="margin-top: 1.5rem;">
+            <label>Schedule Treatment Reminder</label>
+            <div style="display: flex; gap: 1rem;">
+              <input type="date" style="flex: 1;">
+              <input type="time" style="flex: 1;">
+              <button class="btn-secondary"><i class="fas fa-bell"></i> Set</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reminders Page -->
+      <section id="reminders" class="page">
+        <div class="page-header">
+          <h2>Reminders & Tasks</h2>
+          <p>Stay on top of your gardening schedule</p>
+        </div>
+
+        <div class="card">
+          <h3>Set New Reminder</h3>
+          <form id="reminderForm">
+            <div class="form-group">
+              <label for="reminderTitle">Title</label>
+              <input type="text" id="reminderTitle" placeholder="e.g., Water Herbs" required>
+            </div>
+            <div class="form-group">
+              <label for="reminderDate">Date & Time</label>
+              <input type="datetime-local" id="reminderDate" required>
+            </div>
+            <div class="form-group">
+              <label for="reminderPlant">Related Plant</label>
+              <select id="reminderPlant">
+                <option>None</option>
+                <option>Tomato</option>
+                <option>Basil</option>
+                <option>Pepper</option>
+              </select>
+            </div>
+            <button type="submit"><i class="fas fa-bell"></i> Set Reminder</button>
+          </form>
+        </div>
+
+        <div class="reminder-list">
+          <div class="reminder-item">
+            <div class="reminder-icon"><i class="fas fa-tint"></i></div>
+            <div class="reminder-info">
+              <h4>Water Tomatoes</h4>
+              <div class="reminder-meta">
+                <span>Today, 10:00 AM</span>
+                <span>Tomato Plant</span>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <div class="action-btn"><i class="fas fa-check"></i></div>
+              <div class="action-btn"><i class="fas fa-edit"></i></div>
+              <div class="action-btn"><i class="fas fa-trash"></i></div>
+            </div>
+          </div>
+
+          <div class="reminder-item">
+            <div class="reminder-icon"><i class="fas fa-seedling"></i></div>
+            <div class="reminder-info">
+              <h4>Fertilize Basil</h4>
+              <div class="reminder-meta">
+                <span>Tomorrow, 9:00 AM</span>
+                <span>Basil Plant</span>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <div class="action-btn"><i class="fas fa-check"></i></div>
+              <div class="action-btn"><i class="fas fa-edit"></i></div>
+              <div class="action-btn"><i class="fas fa-trash"></i></div>
+            </div>
+          </div>
+
+          <div class="reminder-item">
+            <div class="reminder-icon"><i class="fas fa-cut"></i></div>
+            <div class="reminder-info">
+              <h4>Harvest Peppers</h4>
+              <div class="reminder-meta">
+                <span>Aug 15, 11:00 AM</span>
+                <span>Pepper Plant</span>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <div class="action-btn"><i class="fas fa-check"></i></div>
+              <div class="action-btn"><i class="fas fa-edit"></i></div>
+              <div class="action-btn"><i class="fas fa-trash"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Garden Planner Page -->
+      <section id="garden-planner" class="page">
+        <div class="page-header">
+          <h2>Garden Planner</h2>
+          <p>Design your urban garden layout</p>
+        </div>
+
+        <div class="garden-planner">
+          <div class="planner-tools">
+            <h3>Toolbox</h3>
+            <div class="planner-toolbox">
+              <div class="planner-tool" data-type="plant">
+                <i class="fas fa-seedling"></i>
+                <p>Plant</p>
+              </div>
+              <div class="planner-tool" data-type="pot">
+                <i class="fas fa-vase"></i>
+                <p>Pot</p>
+              </div>
+              <div class="planner-tool" data-type="bench">
+                <i class="fas fa-chair"></i>
+                <p>Bench</p>
+              </div>
+              <div class="planner-tool" data-type="light">
+                <i class="fas fa-lightbulb"></i>
+                <p>Light</p>
+              </div>
+              <div class="planner-tool" data-type="water">
+                <i class="fas fa-faucet"></i>
+                <p>Water</p>
+              </div>
+              <div class="planner-tool" data-type="fence">
+                <i class="fas fa-fence"></i>
+                <p>Fence</p>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+              <h3>Automated Suggestions</h3>
+              <p>Based on your plant selections, we recommend:</p>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li>Place tomatoes in full sun areas</li>
+                <li>Group herbs together for efficient watering</li>
+                <li>Allow 30cm spacing between pepper plants</li>
+              </ul>
+            </div>
+
+            <button class="btn-secondary" style="margin-top: 1.5rem; width: 100%;"><i class="fas fa-save"></i> Save Layout</button>
+            <button class="btn-info" style="margin-top: 0.5rem; width: 100%;"><i class="fas fa-download"></i> Export Plan</button>
+          </div>
+
+          <div class="planner-area" id="plannerArea">
+            <div class="grid-overlay"></div>
+            <!-- Draggable items will be added here via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Garden Journal Page -->
+      <section id="garden-journal" class="page">
+        <div class="page-header">
+          <h2>Garden Journal</h2>
+          <p>Record your gardening journey and track progress</p>
+        </div>
+
+        <div class="card">
+          <h3>New Journal Entry</h3>
+          <form id="journalForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="entryTitle"><i class="fas fa-heading"></i> Title</label>
+                <input type="text" id="entryTitle" placeholder="e.g., Tomato Harvest Day" required>
+              </div>
+
+              <div class="form-group">
+                <label for="entryDate"><i class="fas fa-calendar"></i> Date</label>
+                <input type="date" id="entryDate" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="entryContent"><i class="fas fa-edit"></i> Notes</label>
+              <textarea id="entryContent" rows="4" placeholder="Describe your gardening activities, observations, and learnings..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="entryTags"><i class="fas fa-tags"></i> Tags (comma separated)</label>
+              <input type="text" id="entryTags" placeholder="e.g., tomatoes, harvest, success">
+            </div>
+
+            <div class="form-group">
+              <label for="entryImage"><i class="fas fa-camera"></i> Upload Photo</label>
+              <input type="file" id="entryImage" accept="image/*">
+            </div>
+
+            <button type="submit">
+              <i class="fas fa-book"></i> Save Journal Entry
+            </button>
+          </form>
+        </div>
+
+        <div class="page-header">
+          <h2>Your Journal Entries</h2>
+          <p>Review your gardening history and insights</p>
+        </div>
+
+        <div class="journal-grid">
+          <div class="journal-card">
+            <div class="journal-img">
+              <i class="fas fa-apple-alt"></i>
+            </div>
+            <div class="journal-content">
+              <div class="journal-date">August 8, 2025</div>
+              <h3>First Tomato Harvest</h3>
+              <p>Harvested our first batch of tomatoes today! The plants are producing well despite the heat. Noticed some minor leaf curling on the lower branches.</p>
+              <div class="journal-tags">
+                <span class="journal-tag">Tomatoes</span>
+                <span class="journal-tag">Harvest</span>
+                <span class="journal-tag">Success</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="journal-card">
+            <div class="journal-img">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <div class="journal-content">
+              <div class="journal-date">August 5, 2025</div>
+              <h3>Planted New Herb Garden</h3>
+              <p>Created a new vertical herb garden on the balcony. Planted basil, mint, rosemary, and thyme. Used a new organic potting mix that seems to drain well.</p>
+              <div class="journal-tags">
+                <span class="journal-tag">Herbs</span>
+                <span class="journal-tag">Vertical Garden</span>
+                <span class="journal-tag">Planting</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="journal-card">
+            <div class="journal-img">
+              <i class="fas fa-bug"></i>
+            </div>
+            <div class="journal-content">
+              <div class="journal-date">August 2, 2025</div>
+              <h3>Aphid Problem Solved</h3>
+              <p>Found aphids on the pepper plants. Applied a neem oil solution and introduced ladybugs. The infestation seems to be under control now.</p>
+              <div class="journal-tags">
+                <span class="journal-tag">Pests</span>
+                <span class="journal-tag">Peppers</span>
+                <span class="journal-tag">Solutions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Community Page -->
+      <section id="community" class="page">
+        <div class="page-header">
+          <h2>Community Forum</h2>
+          <p>Connect with other urban gardeners</p>
+        </div>
+
+        <div class="card">
+          <h3>Create New Post</h3>
+          <form id="postForm">
+            <div class="form-group">
+              <label for="postTitle">Title</label>
+              <input type="text" id="postTitle" placeholder="e.g., Tips for Balcony Gardening" required>
+            </div>
+            <div class="form-group">
+              <label for="postContent">Content</label>
+              <textarea id="postContent" rows="4" placeholder="Share your thoughts..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="postTags">Tags (comma separated)</label>
+              <input type="text" id="postTags" placeholder="e.g., balcony, tips, beginners">
+            </div>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Post</button>
+          </form>
+        </div>
+
+        <div class="forum-posts">
+          <div class="forum-post">
+            <div class="post-header">
+              <div class="post-avatar"><i class="fas fa-user"></i></div>
+              <div class="post-meta">
+                <div class="post-author">GreenThumb42</div>
+                <div class="post-date">2 hours ago</div>
+              </div>
+            </div>
+            <div class="post-content">
+              <h3>Best Plants for Small Apartments</h3>
+              <p>Sharing my experience with low-light plants that thrive indoors. Pothos, snake plants, and ZZ plants have been the most resilient in my north-facing apartment...</p>
+            </div>
+            <div class="post-tags">
+              <span class="post-tag">Apartments</span>
+              <span class="post-tag">Indoor</span>
+              <span class="post-tag">Low Light</span>
+            </div>
+            <div class="post-actions">
+              <div class="action-count"><i class="fas fa-heart"></i> 15</div>
+              <div class="action-count"><i class="fas fa-comment"></i> 8</div>
+              <div class="action-count"><i class="fas fa-share"></i> 3</div>
+            </div>
+          </div>
+
+          <div class="forum-post">
+            <div class="post-header">
+              <div class="post-avatar"><i class="fas fa-user"></i></div>
+              <div class="post-meta">
+                <div class="post-author">UrbanGardener</div>
+                <div class="post-date">5 hours ago</div>
+              </div>
+            </div>
+            <div class="post-content">
+              <h3>Automated Watering Systems</h3>
+              <p>Has anyone set up an automated watering system for their balcony garden? Looking for recommendations for a system that can handle 10-15 plants...</p>
+            </div>
+            <div class="post-tags">
+              <span class="post-tag">Automation</span>
+              <span class="post-tag">Watering</span>
+              <span class="post-tag">Tech</span>
+            </div>
+            <div class="post-actions">
+              <div class="action-count"><i class="fas fa-heart"></i> 7</div>
+              <div class="action-count"><i class="fas fa-comment"></i> 12</div>
+              <div class="action-count"><i class="fas fa-share"></i> 2</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container footer-content">
+        <div class="footer-section">
+          <h3>About Us</h3>
+          <p>Smart Urban Gardening Assistant helps city dwellers create thriving green spaces in limited areas.</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="#">Gardening Guides</a></li>
+            <li><a href="#">Plant Database</a></li>
+            <li><a href="#">Community Forum</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Support</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h3>Newsletter</h3>
+          <p>Subscribe for gardening tips and updates</p>
+          <form>
+            <input type="email" placeholder="Your email" style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
+            <button type="submit" style="width: 100%;"><i class="fas fa-envelope"></i> Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="copyright container">
+        © 2025 Smart Urban Gardening. All rights reserved.
+      </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="notification-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Notifications</h3>
+          <button class="close-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <li>Water your tomatoes today!</li>
+            <li>New disease alert for basil.</li>
+            <li>Community post reply received.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>User Profile</h3>
+          <button class="close-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="profileName">Name</label>
+              <input type="text" id="profileName" value="Guest User">
+            </div>
+            <div class="form-group">
+              <label for="profileEmail">Email</label>
+              <input type="email" id="profileEmail" value="guest@example.com">
+            </div>
+            <button type="submit">Update Profile</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra Feature: AI Chat Button -->
+    <div class="ai-chat-btn" title="Ask AI Gardening Assistant">
+      <i class="fas fa-robot"></i>
+    </div>
+  </div>
+<script>
+  // Theme toggle functionality
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = themeToggle.querySelector('i');
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-theme');
+
+    if (document.body.classList.contains('dark-theme')) {
+      themeIcon.className = 'fas fa-sun';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      themeIcon.className = 'fas fa-moon';
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+  // Check saved theme preference
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    themeIcon.className = 'fas fa-sun';
+  }
+
+  // Login functionality
+  const showAppBtn = document.getElementById('show-app');
+  const loginPage = document.getElementById('login-page');
+  const appContainer = document.getElementById('app-container');
+
+  showAppBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginPage.style.display = 'none';
+    appContainer.style.display = 'block';
+  });
+
+  // Navigation between pages with modern transition
+  function navigateToPage(pageId) {
+    const currentPage = document.querySelector('.page.active');
+    const newPage = document.getElementById(pageId);
+
+    if (currentPage) {
+      currentPage.classList.remove('active');
+    }
+
+    // Update active link
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-item').forEach(l => l.classList.remove('active'));
+    document.querySelector(`.nav-link[data-page="${pageId}"]`)?.classList.add('active');
+    document.querySelector(`.mobile-nav-item[data-page="${pageId}"]`)?.classList.add('active');
+
+    // Show the selected page with delay for transition
+    setTimeout(() => {
+      newPage.classList.add('active');
+    }, 100);
+
+    // Close mobile menu if open
+    document.querySelector('.mobile-menu-btn i').className = 'fas fa-bars';
+    document.querySelector('.mobile-nav').classList.remove('active');
+
+    // Initialize page-specific features
+    if (pageId === 'dashboard') {
+      initHealthChart();
+    }
+  }
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      navigateToPage(this.getAttribute('data-page'));
+    });
+  });
+
+  document.querySelectorAll('.mobile-nav-item').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      navigateToPage(this.getAttribute('data-page'));
+    });
+  });
+
+  // Mobile menu toggle
+  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+  mobileMenuBtn.addEventListener('click', () => {
+    const icon = mobileMenuBtn.querySelector('i');
+    const mobileNav = document.querySelector('.mobile-nav');
+
+    if (icon.classList.contains('fa-bars')) {
+      icon.className = 'fas fa-times';
+      mobileNav.classList.add('active');
+    } else {
+      icon.className = 'fas fa-bars';
+      mobileNav.classList.remove('active');
+    }
+  });
+
+  // Journal form submission
+  document.getElementById('journalForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('entryTitle').value;
+    const date = document.getElementById('entryDate').value;
+    const content = document.getElementById('entryContent').value;
+    const tags = document.getElementById('entryTags').value.split(',').map(tag => tag.trim());
+
+    // Format date
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
+    // Create journal card
+    const journalGrid = document.querySelector('.journal-grid');
+    const newEntry = document.createElement('div');
+    newEntry.className = 'journal-card';
+    newEntry.innerHTML = `
+      <div class="journal-img">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="journal-content">
+        <div class="journal-date">${formattedDate}</div>
+        <h3>${title}</h3>
+        <p>${content}</p>
+        <div class="journal-tags">
+          ${tags.map(tag => `<span class="journal-tag">${tag}</span>`).join('')}
+        </div>
+      </div>
+    `;
+
+    // Add to top of grid
+    journalGrid.prepend(newEntry);
+
+    // Reset form
+    this.reset();
+
+    // Show success message
+    alert('Journal entry added successfully!');
+  });
+
+  // Set default date to today in forms
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(input => {
+    input.value = today;
+  });
+
+  // Plant Encyclopedia Filtering (simple type filter)
+  const plantTypeFilter = document.getElementById('plantType');
+  const plants = document.querySelectorAll('.encyclopedia-card');
+
+  plantTypeFilter.addEventListener('change', () => {
+    const selectedType = plantTypeFilter.value;
+
+    plants.forEach(plant => {
+      if (selectedType === 'All Plants' || plant.querySelector('.plant-type').textContent === selectedType) {
+        plant.style.display = 'block';
+      } else {
+        plant.style.display = 'none';
+      }
+    });
+  });
+
+  // Add Plant Form Submission
+  document.getElementById('addPlantForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('plantName').value;
+    const type = document.getElementById('plantType').value;
+    const date = new Date(document.getElementById('plantDate').value).toLocaleDateString();
+
+    const plantGrid = document.querySelector('.plant-grid');
+    const newPlant = document.createElement('div');
+    newPlant.className = 'plant-card';
+    newPlant.innerHTML = `
+      <div class="plant-img"><i class="fas fa-leaf"></i></div>
+      <div class="plant-info">
+        <h3>${name}</h3>
+        <p>${type}</p>
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Health</span>
+            <span>100%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="plant-meta">
+          <span>Planted: ${date}</span>
+          <span>Water: Daily</span>
+        </div>
+      </div>
+    `;
+    plantGrid.prepend(newPlant);
+    this.reset();
+    alert('Plant added!');
+  });
+
+  // Reminder Form Submission
+  document.getElementById('reminderForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const title = document.getElementById('reminderTitle').value;
+    const dateTime = new Date(document.getElementById('reminderDate').value).toLocaleString();
+    const plant = document.getElementById('reminderPlant').value || 'General';
+
+    const reminderList = document.querySelector('.reminder-list');
+    const newReminder = document.createElement('div');
+    newReminder.className = 'reminder-item';
+    newReminder.innerHTML = `
+      <div class="reminder-icon"><i class="fas fa-bell"></i></div>
+      <div class="reminder-info">
+        <h4>${title}</h4>
+        <div class="reminder-meta">
+          <span>${dateTime}</span>
+          <span>${plant}</span>
+        </div>
+      </div>
+      <div class="reminder-actions">
+        <div class="action-btn"><i class="fas fa-check"></i></div>
+        <div class="action-btn"><i class="fas fa-edit"></i></div>
+        <div class="action-btn"><i class="fas fa-trash"></i></div>
+      </div>
+    `;
+    reminderList.prepend(newReminder);
+    this.reset();
+    alert('Reminder set!');
+  });
+
+  // Community Post Form Submission
+  document.getElementById('postForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const title = document.getElementById('postTitle').value;
+    const content = document.getElementById('postContent').value;
+    const tags = document.getElementById('postTags').value.split(',').map(tag => tag.trim());
+
+    const forumPosts = document.querySelector('.forum-posts');
+    const newPost = document.createElement('div');
+    newPost.className = 'forum-post';
+    newPost.innerHTML = `
+      <div class="post-header">
+        <div class="post-avatar"><i class="fas fa-user"></i></div>
+        <div class="post-meta">
+          <div class="post-author">You</div>
+          <div class="post-date">Just now</div>
+        </div>
+      </div>
+      <div class="post-content">
+        <h3>${title}</h3>
+        <p>${content}</p>
+      </div>
+      <div class="post-tags">
+        ${tags.map(tag => `<span class="post-tag">${tag}</span>`).join('')}
+      </div>
+      <div class="post-actions">
+        <div class="action-count"><i class="fas fa-heart"></i> 0</div>
+        <div class="action-count"><i class="fas fa-comment"></i> 0</div>
+        <div class="action-count"><i class="fas fa-share"></i> 0</div>
+      </div>
+    `;
+    forumPosts.prepend(newPost);
+    this.reset();
+    alert('Post created!');
+  });
+
+  // Simple Drag and Drop for Garden Planner
+  const plannerTools = document.querySelectorAll('.planner-tool');
+  const plannerArea = document.getElementById('plannerArea');
+
+  plannerTools.forEach(tool => {
+    tool.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', tool.dataset.type);
+    });
+  });
+
+  plannerArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  plannerArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const type = e.dataTransfer.getData('text/plain');
+    const item = document.createElement('div');
+    item.className = 'garden-item';
+    item.style.left = `${e.offsetX - 25}px`;
+    item.style.top = `${e.offsetY - 25}px`;
+    item.innerHTML = `<i class="fas fa-${type === 'plant' ? 'seedling' : type === 'pot' ? 'vase' : type === 'bench' ? 'chair' : type === 'light' ? 'lightbulb' : type === 'water' ? 'faucet' : 'fence'}"></i><p>${type.charAt(0).toUpperCase() + type.slice(1)}</p>`;
+    item.draggable = true;
+
+    item.addEventListener('dragstart', (ev) => {
+      ev.dataTransfer.setData('text/plain', 'move');
+      item.dataset.offsetX = ev.offsetX;
+      item.dataset.offsetY = ev.offsetY;
+    });
+
+    plannerArea.appendChild(item);
+  });
+
+  // Allow moving existing items
+  plannerArea.addEventListener('drop', (e) => {
+    if (e.dataTransfer.getData('text/plain') === 'move') {
+      const items = plannerArea.querySelectorAll('.garden-item');
+      let movingItem;
+      items.forEach(it => {
+        if (it.draggable) { // Find the one being dragged, but since dragstart sets draggable, assume last one for simplicity
+          movingItem = it;
+        }
+      });
+      if (movingItem) {
+        movingItem.style.left = `${e.offsetX - movingItem.dataset.offsetX}px`;
+        movingItem.style.top = `${e.offsetY - movingItem.dataset.offsetY}px`;
+      }
+    }
+  });
+
+  // Modal handling
+  const notificationBtn = document.querySelector('.notification-btn');
+  const userAvatar = document.getElementById('user-avatar');
+  const modals = document.querySelectorAll('.modal');
+  const closeButtons = document.querySelectorAll('.close-modal');
+
+  notificationBtn.addEventListener('click', () => {
+    document.getElementById('notification-modal').classList.add('active');
+  });
+
+  userAvatar.addEventListener('click', () => {
+    document.getElementById('profile-modal').classList.add('active');
+  });
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modals.forEach(modal => modal.classList.remove('active'));
+    });
+  });
+
+  modals.forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  });
+
+  // Simulate file uploads (for demo)
+  const uploadAreas = document.querySelectorAll('.upload-area');
+  uploadAreas.forEach(area => {
+    const input = area.querySelector('input[type="file"]');
+    area.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => {
+      alert('File uploaded: ' + input.files[0].name);
+      // Simulate showing results
+      if (area.id === 'plantIdUpload') {
+        area.nextElementSibling.style.display = 'grid';
+      } else if (area.id === 'diseaseUpload') {
+        document.getElementById('diseaseResult').style.display = 'block';
+      }
+    });
+  });
+
+  // Initialize health chart
+  function initHealthChart() {
+    const chartContainer = document.getElementById('health-chart');
+    chartContainer.innerHTML = '';
+
+    // Sample health data for the last 7 days
+    const healthData = [85, 87, 82, 80, 84, 88, 90];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const maxValue = Math.max(...healthData);
+
+    days.forEach((day, index) => {
+      const bar = document.createElement('div');
+      bar.className = 'chart-bar';
+      bar.style.height = `0px`; // Start from 0 for animation
+      bar.style.left = `${20 + index * 30}px`;
+
+      const label = document.createElement('div');
+      label.textContent = day;
+      label.style.position = 'absolute';
+      label.style.bottom = '-25px';
+      label.style.left = '50%';
+      label.style.transform = 'translateX(-50%)';
+      label.style.color = 'var(--text-secondary)';
+
+      const value = document.createElement('div');
+      value.textContent = `${healthData[index]}%`;
+      value.style.position = 'absolute';
+      value.style.top = '-25px';
+      value.style.left = '50%';
+      value.style.transform = 'translateX(-50%)';
+      value.style.color = 'var(--text-secondary)';
+
+      bar.appendChild(value);
+      bar.appendChild(label);
+      chartContainer.appendChild(bar);
+
+      // Animate bar height
+      setTimeout(() => {
+        bar.style.height = `${(healthData[index] / maxValue) * 180}px`;
+      }, 100 * index);
+    });
+  }
+
+  // Simulate sensor data updates
+  function updateSensorData() {
+    const sensors = [
+      { id: 'temperature', min: 15, max: 35 },
+      { id: 'moisture', min: 20, max: 80 },
+      { id: 'light', min: 30, max: 100 },
+      { id: 'humidity', min: 40, max: 90 }
+    ];
+
+    sensors.forEach((sensor, index) => {
+      const valueElement = document.querySelectorAll('.sensor-value')[index];
+      const statusElement = document.querySelectorAll('.sensor-status')[index];
+
+      // Generate random value within range
+      const value = Math.floor(Math.random() * (sensor.max - sensor.min)) + sensor.min;
+      valueElement.textContent = sensor.id === 'temperature' ? `${value}°C` : `${value}%`;
+
+      // Update status
+      let status = 'status-good';
+      let statusText = 'Optimal';
+
+      if (sensor.id === 'temperature') {
+        if (value < 18 || value > 30) {
+          status = value < 18 ? 'status-warning' : 'status-danger';
+          statusText = value < 18 ? 'Low' : 'High';
+        }
+      } else if (sensor.id === 'moisture') {
+        if (value < 30) {
+          status = 'status-danger';
+          statusText = 'Low';
+        } else if (value < 40) {
+          status = 'status-warning';
+          statusText = 'Low';
+        }
+      }
+
+      statusElement.className = `sensor-status ${status}`;
+      statusElement.textContent = statusText;
+    });
+  }
+
+  // Update sensor data every 5 seconds
+  setInterval(updateSensorData, 5000);
+  updateSensorData(); // Initial update
+
+  // Initialize health chart on dashboard
+  document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('dashboard').classList.contains('active')) {
+      initHealthChart();
+    }
+  });
+
+  // AI Chat Button (simulated alert for demo)
+  const aiChatBtn = document.querySelector('.ai-chat-btn');
+  aiChatBtn.addEventListener('click', () => {
+    alert('AI Gardening Assistant: How can I help with your garden today?');
+  });
+</script>
+
+</body>
+</html>
